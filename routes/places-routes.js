@@ -80,4 +80,12 @@ router.get('/:placeId', (req, res, next) => {
   res.json({ place });
 });
 
+router.get('/user/:userId', (req, res, next) => {
+  const userId = req.params.userId;
+
+  const places = DUMMY_PLACES.filter((place) => place.creator === userId);
+
+  res.json({ places });
+});
+
 module.exports = router;
