@@ -1,14 +1,60 @@
+const { v4: uuidv4 } = require('uuid');
+const HttpError = require('../models/http-error');
+
 const DUMMY_USERS = [
   {
     id: 'u0',
     name: 'Sara',
-    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRePiA58k0fr1ctJENADPDrYvsENw6hmaPK5g&s',
-    places: 7,
+    email: 'saralance@queenindustrie.com',
+    password: 'notsoblackcanary',
   },
   {
     id: 'u1',
     name: 'John',
-    img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6ecNMnwcSGzb36MWQ_o96_y-J1xKEJrWDjw&s',
-    places: 3,
+    email: 'johnconstantine@warlocks.com',
+    password: 'unicorntears',
   },
 ];
+
+const getUsers = (req, res, next) => {
+  res.json({ users: DUMMY_USERS });
+};
+
+const signup = (req, res, next) => {
+  const { name, email, password } = req.body;
+
+  const emailExists = DUMMY_USERS.find((user) => user.email === email);
+
+  if (emailExists) {
+    throw new HttpError('Could not create user, email already exists.', 422);
+  }
+
+  const newUser = {
+    id: uuidv4(),
+    name,
+    email,
+    password,
+  };
+
+  DUMMY_USERS.push(newUser);
+  res.status(201).json({ user: newUser });
+};
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  const user = DUMMY_USERS.find((user) => user.email === email);
+
+  if (!user || user.password !== password) {
+    throw new HttpError(
+      'Could not identify user, credentials seem to be wrong.',
+      401
+    );
+  }
+  res.json({ msg: 'logged in!' });
+};
+
+module.exports = {
+  getUsers,
+  signup,
+  login,
+};
