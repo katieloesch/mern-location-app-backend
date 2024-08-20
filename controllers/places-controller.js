@@ -60,19 +60,31 @@ let DUMMY_PLACES = [
   },
 ];
 
-const getPlaceByID = (req, res, next) => {
+const getPlaceByID = async (req, res, next) => {
   const placeId = req.params.placeId;
-
-  const place = DUMMY_PLACES.find((place) => place.id === placeId);
+  let place;
+  try {
+    place = await Place.findById(placeId); // does not return a real promise
+  } catch (err) {
+    const error = new HttpError(
+      'Something went wrong, could not find place.',
+      500
+    );
+    return next(error);
+  }
 
   if (!place) {
-    return next(new HttpError('Could not find a place with provided ID.', 404));
+    const error = new HttpError(
+      'Could not find a place with provided ID.',
+      404
+    );
+    return next(error);
 
     // for asynchronous functions: return next(error);
     // for synchronous functions, use either return next(error) or alternatively: throw error;
   }
 
-  res.json({ place });
+  res.json({ place: place.toObject({ getters: true }) }); // getters: true -> _if turn into id property
 };
 
 const getPlacesByUserId = (req, res, next) => {
