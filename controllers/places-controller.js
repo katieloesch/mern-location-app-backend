@@ -3,6 +3,7 @@ const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
 const getCoordsForAddress = require('../util/location');
+const Place = require('../models/place');
 
 let DUMMY_PLACES = [
   {
@@ -108,16 +109,26 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  const newPlace = {
-    id: uuidv4(),
+  const newPlace = new Place({
     title,
     description,
-    location: coordinates,
     address,
+    location: coordinates,
+    image:
+      'https://entiretravel.imgix.net/getmedia/a196b23a-200d-4f59-ae72-c31af06f4a5d/about-tahiti.jpg?auto=format',
     creator,
-  };
+  });
 
-  DUMMY_PLACES.push(newPlace);
+  try {
+    await newPlace.save();
+  } catch (err) {
+    const error = new HttpError(
+      'Creating place failed, please try again.',
+      500
+    );
+    return next(error);
+  }
+
   res.status(201).json({ place: newPlace });
 };
 
