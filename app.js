@@ -1,6 +1,10 @@
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+
+const MONGODB_URL = process.env.MONGODB_URL;
 
 const placesRoutes = require('./routes/places-routes');
 const usersRoutes = require('./routes/users-routes');
@@ -31,9 +35,7 @@ app.use((error, req, res, next) => {
 });
 
 mongoose
-  .connect(
-    'mongodb+srv://katie:MEILx7mwRSkRCcyP@cluster0.iz4gc.mongodb.net/places?retryWrites=true&w=majority&appName=Cluster0'
-  )
+  .connect(MONGODB_URL)
   .then(() => {
     app.listen(5100, () => {
       console.log('server running on port 5100...');
