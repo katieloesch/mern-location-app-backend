@@ -1,9 +1,10 @@
-const { v4: uuidv4 } = require('uuid');
 const { validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 
 const HttpError = require('../models/http-error');
 const getCoordsForAddress = require('../util/location');
 const Place = require('../models/place');
+const User = require('../models/user');
 
 let DUMMY_PLACES = [
   {
@@ -142,8 +143,35 @@ const createPlace = async (req, res, next) => {
     creator,
   });
 
+  let user;
+
   try {
-    await newPlace.save();
+    user = await User.findById(creator);
+  } catch (err) {
+    const error = new HttpError(
+      'Creating place failed, please try again.',
+      500
+    );
+    return next(error);
+  }
+
+  if (!user) {
+    const error = new HttpError('Could not find user for provided ID.', 404);
+    return next(error);
+  }
+
+  console.log(user);
+
+  try {
+    const sess = await mongoose.startSession();
+
+    sess.startTransaction();
+    await newPlace.save({ session: sess });
+
+    user.places.push(newPlace);
+    await user.save({ session: sess });
+
+    await sess.commitTransaction();
   } catch (err) {
     const error = new HttpError(
       'Creating place failed, please try again.',
