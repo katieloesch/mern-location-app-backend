@@ -84,8 +84,7 @@ const createPlace = async (req, res, next) => {
     description,
     address,
     location: coordinates,
-    image:
-      'https://entiretravel.imgix.net/getmedia/a196b23a-200d-4f59-ae72-c31af06f4a5d/about-tahiti.jpg?auto=format',
+    image: req.file.path,
     creator,
   });
 
