@@ -1,5 +1,7 @@
 require('dotenv').config();
 
+const fs = require('fs');
+const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -14,6 +16,8 @@ const app = express();
 
 //middleware
 app.use(bodyParser.json());
+app.use('/uploads/images', express.static(path.join('uploads', 'images')));
+
 app.use((req, res, next) => {
   // handle cors issues
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -33,15 +37,23 @@ app.use((req, res, next) => {
   throw error;
 });
 app.use((error, req, res, next) => {
-  //error handling -> 4 parameters
+  // error handling -> 4 parameters
   // will run if any middleware throws an error
+
+  if (req.file) {
+    // if there is an error, delete image
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
+
   if (res.headerSent) {
     return next(error);
   }
   // if no response has been sent
   res
     .status(error.code || 500)
-    .json({ message: error.message || 'An unknown error occured!' });
+    .json({ message: error.message || 'An unknown error occurred!' });
 });
 
 mongoose
