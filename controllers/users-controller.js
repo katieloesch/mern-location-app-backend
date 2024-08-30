@@ -136,7 +136,20 @@ const login = async (req, res, next) => {
     return next(error);
   }
 
-  res.json({ msg: 'Logged in!', user: user.toObject({ getters: true }) });
+  let token;
+  try {
+    // .sign(payload, privateKey, expiration)
+    token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+  } catch (err) {
+    const error = new HttpError('Log in failed, please try again later.', 500);
+    return next(error);
+  }
+
+  res.json({ userId: user.id, email: user.email, token: token });
 };
 
 module.exports = {
