@@ -50,8 +50,7 @@ const signup = async (req, res, next) => {
   const newUser = new User({
     name,
     email,
-    image:
-      'https://people.com/thmb/aSn4RsM25ETxV0e60F5waxfCVsY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc():focal(919x292:921x294)/Tom-Hiddleston-as-Loki-021423-9fb9630ef3474e42a996012c183419ad.jpg',
+    image: req.file.path,
     password,
     places: [],
   });
