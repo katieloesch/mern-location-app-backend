@@ -10,7 +10,7 @@ router.get('/:placeId', placesController.getPlaceByID);
 
 router.get('/user/:userId', placesController.getPlacesByUserId);
 
-router.use(checkAuth);
+router.use(checkAuth); // all routes below are protected routes (need token to access)
 
 router.post(
   '/',
