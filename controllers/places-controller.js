@@ -106,8 +106,6 @@ const createPlace = async (req, res, next) => {
     return next(error);
   }
 
-  console.log(user);
-
   try {
     const sess = await mongoose.startSession();
 
@@ -150,6 +148,14 @@ const updatePlace = async (req, res, next) => {
     const error = new HttpError(
       'Something went wrong, could not update place.',
       500
+    );
+    return next(error);
+  }
+
+  if (place.creator.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      'You are not authorised to edit this place!',
+      401
     );
     return next(error);
   }
