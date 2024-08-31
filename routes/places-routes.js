@@ -3,11 +3,14 @@ const { check } = require('express-validator');
 
 const placesController = require('../controllers/places-controller');
 const fileUpload = require('../middleware/file-upload');
+const checkAuth = require('../middleware/check-auth');
 const router = express.Router();
 
 router.get('/:placeId', placesController.getPlaceByID);
 
 router.get('/user/:userId', placesController.getPlacesByUserId);
+
+router.use(checkAuth); // all routes below are protected routes (need token to access)
 
 router.post(
   '/',
